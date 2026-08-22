@@ -38,3 +38,18 @@ export function toNullableString(value: unknown) {
 export function displayValue(value?: string | number | null) {
   return value === undefined || value === null || value === '' ? '-' : String(value)
 }
+
+/** 列表摘要：去 HTML/多余空白后截断 */
+export function plainTextExcerpt(content: unknown, maxLength = 96): string {
+  if (content === undefined || content === null) return ''
+  const text = String(content)
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&[a-z]+;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  if (!text) return ''
+  return text.length > maxLength ? `${text.slice(0, maxLength)}…` : text
+}

@@ -12,14 +12,27 @@ import { wireBool } from '@/utils/wire'
 const userCenterPasswordPath = '/usercenter?tab=password'
 const userCenterEmailPath = '/usercenter?tab=email'
 const userCenterPhonePath = '/usercenter?tab=phone'
+const userCenterIdentityPath = '/usercenter?tab=identity'
+
+export interface IdentityStatus {
+  status?: string | null
+  documentType?: string | null
+  realNameMasked?: string | null
+  documentNoMasked?: string | null
+  verifyChannel?: string | null
+  provider?: string | null
+  verifiedAt?: string | null
+  revokedAt?: string | null
+  pendingCase?: Record<string, unknown> | null
+}
 
 export interface AuthUserInfo {
   accountId: string
   account: string
   accountType: string
-  name?: string | null
   nickname?: string | null
   avatar?: string | null
+  identity?: IdentityStatus | null
   roleIds: string[]
   deptIds: string[]
   groupIds: string[]
@@ -30,6 +43,7 @@ export interface AuthUserInfo {
   passwordExpired?: boolean
   forceBindEmail?: boolean
   forceBindPhone?: boolean
+  forceBindIdentity?: boolean
   loginAt: number
 }
 
@@ -60,14 +74,29 @@ interface AuthState {
   resolveSecurityRedirect: (fallback?: string) => string
 }
 
+function mapIdentity(data: any): IdentityStatus | null {
+  if (!data || typeof data !== 'object') return null
+  return {
+    status: data.status ?? null,
+    documentType: data.document_type ?? data.documentType ?? null,
+    realNameMasked: data.real_name_masked ?? data.realNameMasked ?? null,
+    documentNoMasked: data.document_no_masked ?? data.documentNoMasked ?? null,
+    verifyChannel: data.verify_channel ?? data.verifyChannel ?? null,
+    provider: data.provider ?? null,
+    verifiedAt: data.verified_at ?? data.verifiedAt ?? null,
+    revokedAt: data.revoked_at ?? data.revokedAt ?? null,
+    pendingCase: data.pending_case ?? data.pendingCase ?? null,
+  }
+}
+
 function mapMe(data: any, loginAt = Date.now()): AuthUserInfo {
   return {
     accountId: data.account_id,
     account: data.account,
     accountType: data.account_type,
-    name: data.name,
     nickname: data.nickname,
     avatar: data.avatar,
+    identity: mapIdentity(data.identity),
     roleIds: data.role_ids ?? [],
     deptIds: data.dept_ids ?? [],
     groupIds: data.group_ids ?? [],
@@ -78,6 +107,7 @@ function mapMe(data: any, loginAt = Date.now()): AuthUserInfo {
     passwordExpired: wireBool(data.password_expired ?? false),
     forceBindEmail: wireBool(data.force_bind_email ?? false),
     forceBindPhone: wireBool(data.force_bind_phone ?? false),
+    forceBindIdentity: wireBool(data.force_bind_identity ?? false),
     loginAt,
   }
 }
@@ -87,6 +117,7 @@ export function resolveSecurityWallPath(user: AuthUserInfo | null | undefined): 
   if (user.passwordExpired) return userCenterPasswordPath
   if (user.forceBindEmail) return userCenterEmailPath
   if (user.forceBindPhone) return userCenterPhonePath
+  if (user.forceBindIdentity) return userCenterIdentityPath
   return null
 }
 
@@ -101,11 +132,12 @@ export function isAllowedUnderSecurityWall(
       pathname.startsWith('/usercenter') && new URLSearchParams(search).get('tab') === 'password'
     )
   }
-  if (user.forceBindEmail || user.forceBindPhone) {
+  if (user.forceBindEmail || user.forceBindPhone || user.forceBindIdentity) {
     if (!pathname.startsWith('/usercenter')) return false
     const tab = new URLSearchParams(search).get('tab')
     if (user.forceBindEmail && tab === 'email') return true
     if (user.forceBindPhone && tab === 'phone') return true
+    if (user.forceBindIdentity && tab === 'identity') return true
     return false
   }
   return true
@@ -174,11 +206,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const passwordExpired = wireBool(response.data.password_expired ?? false)
     const forceBindEmail = wireBool(response.data.force_bind_email ?? false)
     const forceBindPhone = wireBool(response.data.force_bind_phone ?? false)
+    const forceBindIdentity = wireBool(response.data.force_bind_identity ?? false)
     const warningDays = response.data.password_expiry_warning_days
     if (passwordExpired) {
       message.warning('密码已过期，请先修改密码')
-    } else if (forceBindEmail || forceBindPhone) {
-      message.warning('请先完成账号安全绑定')
+    } else if (forceBindEmail || forceBindPhone || forceBindIdentity) {
+      message.warning(
+        forceBindIdentity ? '请先完成实名认证' : '请先完成账号安全绑定',
+      )
     } else if (typeof warningDays === 'number' && warningDays > 0) {
       message.warning(`密码将在 ${warningDays} 天后过期，请及时修改`)
     }

@@ -8,8 +8,6 @@ export function mapNames(items?: { id: string; name: string }[]) {
 }
 
 export function displayValue(value?: unknown) {
-  if (value === undefined || value === null || value === '') {
-    return '-'
-  }
-  return String(value)
+  const text = String(value ?? '').trim()
+  return text || '未设置'
 }

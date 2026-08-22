@@ -12,9 +12,6 @@
 }
 
 .app-header__inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   height: 100%;
   padding: 0 16px;
 }
@@ -28,23 +25,4 @@
   .app-header__inner {
     padding: 0 24px;
   }
-}
-
-.header-icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--ant-color-text);
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.header-icon-btn:hover {
-  background: var(--ant-color-fill-secondary);
 }

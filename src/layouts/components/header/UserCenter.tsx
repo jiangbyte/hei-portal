@@ -1,17 +1,18 @@
 /** Author: Charlie */
 
 import { useEffect } from 'react'
-import { Avatar, Button, Dropdown, Modal, Space, Tooltip, Typography, message } from 'antd'
+import { Avatar, Button, Dropdown, Grid, Modal, Space, Typography, message } from 'antd'
 import {
   FormOutlined,
   HomeOutlined,
   LogoutOutlined,
-  SettingOutlined,
   UserOutlined,
 } from '@ant-design/icons'
 import type { DropdownProps, MenuProps } from 'antd'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/auth'
+
+const { useBreakpoint } = Grid
 
 type Props = {
   compact?: boolean
@@ -21,6 +22,7 @@ type Props = {
 export function UserCenter({ compact = false, placement = 'bottomRight' }: Props) {
   const navigate = useNavigate()
   const location = useLocation()
+  const screens = useBreakpoint()
   const userInfo = useAuthStore((s) => s.userInfo)
   const ensureSession = useAuthStore((s) => s.ensureSession)
   const logout = useAuthStore((s) => s.logout)
@@ -34,20 +36,17 @@ export function UserCenter({ compact = false, placement = 'bottomRight' }: Props
   if (!loggedIn) {
     if (compact) {
       return (
-        <Tooltip title="登录" placement="right">
-          <Button
-            type="text"
-            className="!h-10 !w-10 !px-0"
-            icon={<UserOutlined />}
-            aria-label="登录"
-            onClick={() => navigate('/auth/login')}
-          />
-        </Tooltip>
+        <Button
+          type="text"
+          icon={<UserOutlined />}
+          aria-label="登录"
+          onClick={() => navigate('/auth/login')}
+        />
       )
     }
 
     return (
-      <Space size={8}>
+      <Space size={8} align="center">
         <Button onClick={() => navigate('/auth/register')}>注册</Button>
         <Button type="primary" onClick={() => navigate('/auth/login')}>
           登录
@@ -56,19 +55,15 @@ export function UserCenter({ compact = false, placement = 'bottomRight' }: Props
     )
   }
 
-  const displayName = userInfo?.nickname || userInfo?.account || '用户'
+  const displayName = userInfo?.nickname || '-'
   const avatarSrc = userInfo?.avatar || undefined
+  const showName = !compact && screens.md
 
   const items: MenuProps['items'] = [
     {
-      key: 'profile',
-      icon: <UserOutlined />,
-      label: '个人主页',
-    },
-    {
       key: 'userCenter',
-      icon: <SettingOutlined />,
-      label: '账号设置',
+      icon: <UserOutlined />,
+      label: '个人中心',
     },
     {
       key: 'feedback',
@@ -89,10 +84,6 @@ export function UserCenter({ compact = false, placement = 'bottomRight' }: Props
   ]
 
   const onClick: MenuProps['onClick'] = ({ key }) => {
-    if (key === 'profile') {
-      navigate('/profile')
-      return
-    }
     if (key === 'userCenter') {
       navigate('/usercenter')
       return
@@ -119,22 +110,18 @@ export function UserCenter({ compact = false, placement = 'bottomRight' }: Props
     }
   }
 
-  const avatarBtn = (
+  return (
     <Dropdown menu={{ items, onClick }} trigger={['click']} placement={placement}>
-      <Space className="cursor-pointer select-none" size={8}>
-        <Avatar src={avatarSrc} icon={<UserOutlined />} size={compact ? 32 : 'default'} />
-        {compact ? null : (
-          <Typography.Text className="hidden max-w-28 truncate md:inline">
-            {displayName}
-          </Typography.Text>
-        )}
-      </Space>
+      <Button type="text">
+        <Space size={8}>
+          <Avatar src={avatarSrc} icon={<UserOutlined />} size={compact ? 32 : 'default'} />
+          {showName ? (
+            <Typography.Text ellipsis style={{ maxWidth: 112 }}>
+              {displayName}
+            </Typography.Text>
+          ) : null}
+        </Space>
+      </Button>
     </Dropdown>
   )
-
-  if (compact) {
-    return <div className="flex flex-col items-center gap-2">{avatarBtn}</div>
-  }
-
-  return <Space size={8}>{avatarBtn}</Space>
 }

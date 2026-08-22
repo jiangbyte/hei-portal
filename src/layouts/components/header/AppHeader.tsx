@@ -1,7 +1,7 @@
 /** Author: Charlie */
 
 import { useState } from 'react'
-import { Button, Grid } from 'antd'
+import { Button, Flex, Grid, Space } from 'antd'
 import { MenuOutlined } from '@ant-design/icons'
 import { useLocation } from 'react-router-dom'
 import { MobileDrawer } from '../common/MobileDrawer'
@@ -34,8 +34,8 @@ export function AppHeader() {
   return (
     <>
       <header className="app-header">
-        <div className="app-header__inner">
-          <div className="flex-y-center gap-3 min-w-0 flex-1">
+        <Flex align="center" justify="space-between" className="app-header__inner">
+          <Flex align="center" gap={12} className="min-w-0 flex-1">
             {isMobile ? (
               <Button
                 type="text"
@@ -50,13 +50,13 @@ export function AppHeader() {
                 <NavMenu mode="horizontal" />
               </div>
             ) : null}
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
+          </Flex>
+          <Space size={4} align="center">
             <ThemeSwitch />
             {loggedIn ? <Notices /> : null}
             <UserCenter />
-          </div>
-        </div>
+          </Space>
+        </Flex>
       </header>
 
       <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>

@@ -1,11 +1,12 @@
 /** Author: Charlie */
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Badge, Button, Divider, Popover, Tooltip } from 'antd'
+import { Badge, Button, Card, Popover, Space } from 'antd'
 import { BellOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { myNoticeApi } from '@/api'
-import { formatDateTime, wireBool } from '@/utils'
+import { formatDateTime, plainTextExcerpt, wireBool } from '@/utils'
+import { dictTypeData } from '@/utils/dict'
 import { readPageMeta } from '@/utils/wire'
 import { useMessageUnreadStore } from '@/stores/messageUnread'
 import { MessageDetailModal, type MessageDetailSource } from '@/components/sys/MessageDetailModal'
@@ -22,6 +23,7 @@ interface NoticeSource {
   icon: 'announcement' | 'notification'
   tagTitle?: string
   tagType?: BannerItem['tagType']
+  severityLabel?: string
   description?: string
   date: string
   sourceType: NoticeKind
@@ -37,7 +39,10 @@ function mapHistoryItem(item: any): NoticeSource {
     icon: kind === 'ANNOUNCEMENT' ? 'announcement' : 'notification',
     tagTitle: kind === 'ANNOUNCEMENT' ? '公告' : '通知',
     tagType: kind === 'ANNOUNCEMENT' ? 'warning' : 'processing',
-    description: item.content,
+    severityLabel: item.severity
+      ? dictTypeData('NOTIFICATION_SEVERITY', item.severity) || item.severity
+      : '',
+    description: plainTextExcerpt(item.content, 72),
     date: formatDateTime(item.publish_at || item.created_at),
     sourceType: kind,
     sourceId: item.id,
@@ -145,8 +150,23 @@ export function Notices() {
   }
 
   const content = (
-    <div style={{ width: 390 }}>
-      <div style={{ padding: '12px 12px 0', fontWeight: 600 }}>我的消息</div>
+    <Card
+      title="我的消息"
+      size="small"
+      bordered={false}
+      styles={{ body: { padding: 0 } }}
+      style={{ width: 390 }}
+      extra={
+        <Space size={8}>
+          <Button type="link" size="small" disabled={unreadTotal <= 0} onClick={() => void markAllRead()}>
+            全部已读
+          </Button>
+          <Button type="link" size="small" onClick={goMore}>
+            查看更多
+          </Button>
+        </Space>
+      }
+    >
       <NoticeList
         list={list}
         loading={loading}
@@ -154,22 +174,7 @@ export function Notices() {
         onOpen={handleOpen}
         onLoadMore={() => void loadMore()}
       />
-      <Divider style={{ margin: 0 }} />
-      <div className="flex gap-2 p-2">
-        <Button
-          className="flex-1"
-          size="small"
-          type="text"
-          disabled={unreadTotal <= 0}
-          onClick={() => void markAllRead()}
-        >
-          全部已读
-        </Button>
-        <Button className="flex-1" size="small" type="text" onClick={goMore}>
-          查看更多
-        </Button>
-      </div>
-    </div>
+    </Card>
   )
 
   return (
@@ -184,14 +189,17 @@ export function Notices() {
         }}
         placement="bottomRight"
         arrow={{ pointAtCenter: true }}
+        overlayInnerStyle={{ padding: 0 }}
       >
-        <Tooltip title="消息" placement="bottom">
-          <button type="button" className="header-icon-btn" aria-label="消息">
+        <Button
+          type="text"
+          aria-label="消息"
+          icon={
             <Badge count={unreadTotal} overflowCount={99} size="small">
               <BellOutlined style={{ fontSize: 18 }} />
             </Badge>
-          </button>
-        </Tooltip>
+          }
+        />
       </Popover>
 
       <MessageDetailModal

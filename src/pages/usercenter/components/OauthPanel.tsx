@@ -4,8 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Avatar, Button, List, Popconfirm, Space, Spin, Typography, message } from 'antd'
 import { authApi } from '@/api'
 import { wireBool } from '@/utils/wire'
-import '../usercenter.css'
-
 type Binding = {
   provider: string
   label: string

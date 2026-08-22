@@ -5,7 +5,7 @@ import { Alert, Button, Form, Input, Modal, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { authApi } from '@/api'
 import { useAuthStore } from '@/stores/auth'
-import '../usercenter.css'
+const formStyle = { maxWidth: 480, width: '100%' } as const
 
 export function CancelAccountPanel() {
   const [form] = Form.useForm()
@@ -46,7 +46,7 @@ export function CancelAccountPanel() {
   }
 
   return (
-    <div className="profile-form profile-form--narrow w-full min-w-0">
+    <div style={formStyle}>
       <Alert
         type="warning"
         showIcon

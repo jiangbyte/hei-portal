@@ -5,7 +5,7 @@ import { Button, Form, Input, message } from 'antd'
 import { authApi } from '@/api'
 import { encryptPasswords } from '@/utils/security'
 import { PasswordStrength } from '@/components/common/PasswordStrength'
-import '../usercenter.css'
+const formStyle = { maxWidth: 480, width: '100%' } as const
 
 type VerifyMethod = 'OLD_PASSWORD' | 'EMAIL_CODE' | 'PHONE_CODE'
 
@@ -72,7 +72,7 @@ export function PasswordPanel() {
     <Form
       form={form}
       layout="vertical"
-      className="profile-form profile-form--narrow w-full min-w-0"
+      style={formStyle}
     >
       {verifyMethod === 'OLD_PASSWORD' ? (
         <Form.Item

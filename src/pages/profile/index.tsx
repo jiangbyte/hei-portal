@@ -41,11 +41,13 @@ export function ProfilePage() {
     }
   }, [accountId])
 
-  const displayName =
-    profile?.nickname ||
-    profile?.name ||
-    (isSelf ? userInfo?.nickname || userInfo?.name || userInfo?.account : null) ||
-    '未命名用户'
+  const nickname = String(
+    profile?.nickname ?? (isSelf ? userInfo?.nickname : null) ?? '',
+  ).trim()
+  const displayName = nickname || '未命名用户'
+  const accountLabel = String(
+    profile?.account ?? (isSelf ? userInfo?.account : null) ?? '',
+  ).trim()
   const avatarSrc = profile?.avatar || (isSelf ? userInfo?.avatar : undefined) || undefined
   const signature = String(profile?.signature || '').trim()
 
@@ -84,6 +86,9 @@ export function ProfilePage() {
                     <h1 className="m-0 text-[clamp(1.5rem,2.4vw,2rem)] font-bold leading-tight tracking-tight [text-shadow:0_1px_12px_rgba(15,23,42,0.35)]">
                       {displayName}
                     </h1>
+                    {accountLabel ? (
+                      <p className="mt-1 text-[0.925rem] text-white/75">@{accountLabel}</p>
+                    ) : null}
                     {signature ? (
                       <p className="mt-2 max-w-2xl text-[0.925rem] leading-relaxed text-white/85">
                         {signature}

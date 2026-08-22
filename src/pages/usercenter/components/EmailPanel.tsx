@@ -7,7 +7,7 @@ import { useAuthStore } from '@/stores/auth'
 import { encryptPasswords } from '@/utils/security'
 import { isValidEmail } from '@/utils/validate'
 import { wireBool } from '@/utils/wire'
-import '../usercenter.css'
+const formStyle = { maxWidth: 480, width: '100%' } as const
 
 const OTP_COOLDOWN_SECONDS = 60
 
@@ -144,7 +144,7 @@ export function EmailPanel() {
         <Form
           form={form}
           layout="vertical"
-          className="profile-form profile-form--narrow w-full min-w-0"
+          style={formStyle}
         >
           <Form.Item
             name="email"

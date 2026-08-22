@@ -1,7 +1,20 @@
 /** Author: Charlie */
 
 import { useCallback, useEffect, useState } from 'react'
-import { Badge, Button, Empty, List, Pagination, Space, Spin, Tag, Typography, message } from 'antd'
+import {
+  Avatar,
+  Badge,
+  Button,
+  Empty,
+  Flex,
+  List,
+  Pagination,
+  Space,
+  Spin,
+  Tag,
+  Typography,
+  message,
+} from 'antd'
 import { NotificationOutlined, SoundOutlined } from '@ant-design/icons'
 import { myNoticeApi } from '@/api'
 import { MessageDetailModal, type MessageDetailSource } from '@/components/sys/MessageDetailModal'
@@ -9,6 +22,8 @@ import { useMessageUnreadStore } from '@/stores/messageUnread'
 import { formatDateTime, wireBool } from '@/utils'
 import { dictTypeData } from '@/utils/dict'
 import { readPageMeta } from '@/utils/wire'
+
+import { usePanelActions } from './PanelActionsContext'
 
 export function MessageFeedPanel() {
   const notifyReadAll = useMessageUnreadStore((s) => s.notifyReadAll)
@@ -20,12 +35,10 @@ export function MessageFeedPanel() {
   const [detailOpen, setDetailOpen] = useState(false)
   const [detailSource, setDetailSource] = useState<MessageDetailSource | null>(null)
   const requestKey = `${page}|${pageSize}`
-  const [activeKey, setActiveKey] = useState(requestKey)
 
-  if (activeKey !== requestKey) {
-    setActiveKey(requestKey)
+  useEffect(() => {
     setLoading(true)
-  }
+  }, [requestKey])
 
   const applyPage = useCallback((data: any, current: number, size: number) => {
     setRows(
@@ -109,16 +122,19 @@ export function MessageFeedPanel() {
     message.success('已全部标记为已读')
   }
 
+  usePanelActions([loading, fetchPage], () => (
+    <Space size={8}>
+      <Button type="link" loading={loading} onClick={() => void fetchPage()}>
+        刷新
+      </Button>
+      <Button type="link" onClick={() => void markAllRead()}>
+        全部已读
+      </Button>
+    </Space>
+  ))
+
   return (
     <Space direction="vertical" size={12} className="w-full min-w-0">
-      <div className="flex justify-end gap-4">
-        <Button type="link" loading={loading} onClick={() => void fetchPage()}>
-          刷新
-        </Button>
-        <Button type="link" onClick={() => void markAllRead()}>
-          全部已读
-        </Button>
-      </div>
 
       <Spin spinning={loading}>
         {!loading && !rows.length ? (
@@ -132,17 +148,11 @@ export function MessageFeedPanel() {
                 <List.Item.Meta
                   avatar={
                     <Badge dot={!row.is_read}>
-                      <div
-                        className="flex h-9 w-9 items-center justify-center rounded-full"
-                        style={{
-                          background: 'var(--ant-color-fill-quaternary)',
-                          color: row.is_read
-                            ? 'var(--ant-color-text-tertiary)'
-                            : 'var(--ant-color-primary)',
-                        }}
-                      >
-                        {row.kind === 'ANNOUNCEMENT' ? <SoundOutlined /> : <NotificationOutlined />}
-                      </div>
+                      <Avatar
+                        icon={
+                          row.kind === 'ANNOUNCEMENT' ? <SoundOutlined /> : <NotificationOutlined />
+                        }
+                      />
                     </Badge>
                   }
                   title={
@@ -180,7 +190,7 @@ export function MessageFeedPanel() {
       </Spin>
 
       {total > 0 ? (
-        <div className="flex justify-end">
+        <Flex justify="flex-end">
           <Pagination
             current={page}
             pageSize={pageSize}
@@ -192,7 +202,7 @@ export function MessageFeedPanel() {
               setPageSize(size)
             }}
           />
-        </div>
+        </Flex>
       ) : null}
 
       <MessageDetailModal
