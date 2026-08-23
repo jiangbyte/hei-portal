@@ -45,6 +45,14 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(rootDir, 'src'),
       },
     },
+    optimizeDeps: {
+      include: ['node-forge'],
+    },
+    build: {
+      commonjsOptions: {
+        transformMixedEsModules: true,
+      },
+    },
     server: {
       host: '0.0.0.0',
       port,

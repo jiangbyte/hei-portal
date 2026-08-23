@@ -8,6 +8,7 @@ import './captcha-input.css'
 
 export type CaptchaInputHandle = {
   refresh: () => Promise<void>
+  getValues: () => { captcha_id: string; captcha_value: string }
 }
 
 type Props = {
@@ -25,16 +26,22 @@ export const CaptchaInput = forwardRef<CaptchaInputHandle, Props>(function Captc
 ) {
   const [loading, setLoading] = useState(true)
   const [imageBase64, setImageBase64] = useState('')
+  const captchaIdRef = useRef('')
   const idChangeRef = useRef(onCaptchaIdChange)
   const valueChangeRef = useRef(onChange)
   idChangeRef.current = onCaptchaIdChange
   valueChangeRef.current = onChange
 
+  function setCaptchaId(nextId: string) {
+    captchaIdRef.current = nextId
+    idChangeRef.current?.(nextId)
+  }
+
   async function refresh() {
     setLoading(true)
     try {
       const response = await authApi.captcha('svg')
-      idChangeRef.current?.(response.data.captcha_id)
+      setCaptchaId(response.data.captcha_id)
       valueChangeRef.current?.('')
       setImageBase64(response.data.image_base64)
     } finally {
@@ -42,7 +49,13 @@ export const CaptchaInput = forwardRef<CaptchaInputHandle, Props>(function Captc
     }
   }
 
-  useImperativeHandle(ref, () => ({ refresh }))
+  useImperativeHandle(ref, () => ({
+    refresh,
+    getValues: () => ({
+      captcha_id: captchaIdRef.current,
+      captcha_value: value,
+    }),
+  }))
 
   useEffect(() => {
     let cancelled = false
@@ -52,7 +65,7 @@ export const CaptchaInput = forwardRef<CaptchaInputHandle, Props>(function Captc
         if (cancelled) {
           return
         }
-        idChangeRef.current?.(response.data.captcha_id)
+        setCaptchaId(response.data.captcha_id)
         valueChangeRef.current?.('')
         setImageBase64(response.data.image_base64)
       } finally {

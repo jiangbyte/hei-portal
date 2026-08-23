@@ -1,0 +1,13 @@
+# 本地 dist 已构建后快速打镜像：docker build -f Dockerfile.dist -t registry.cn-beijing.aliyuncs.com/czbyte/hei-portal:latest .
+FROM swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/nginx:1.27-alpine
+
+COPY dist /usr/share/nginx/html
+COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
+
+ENV BACKEND_HOST="127.0.0.1" \
+    BACKEND_PORT="8000" \
+    CLIENT_MAX_BODY_SIZE="10m" \
+    CONTENT_SECURITY_POLICY="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" \
+    HSTS_HEADER=""
+
+EXPOSE 80

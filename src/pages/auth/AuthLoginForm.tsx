@@ -192,6 +192,13 @@ export function AuthLoginForm() {
     try {
       let password = ''
       let passwordKeyId: string | undefined
+      const captchaState = captchaRef.current?.getValues()
+      const captchaId = captchaState?.captcha_id || values.captcha_id
+      const captchaValue = captchaState?.captcha_value || values.captcha_value
+      if (!captchaId?.trim() || !captchaValue?.trim()) {
+        message.warning('请输入验证码')
+        return
+      }
       if (resolvedLoginMode === 'PASSWORD') {
         const encrypted = await encryptPasswords({ password: values.password || '' })
         password = encrypted.values.password || ''
@@ -205,8 +212,8 @@ export function AuthLoginForm() {
         resolvedActiveType,
         {
           password_key_id: passwordKeyId,
-          captcha_id: values.captcha_id,
-          captcha_value: values.captcha_value,
+          captcha_id: captchaId,
+          captcha_value: captchaValue.trim(),
           login_mode: resolvedLoginMode,
           ...(resolvedLoginMode === 'OTP' && values.otp_code?.trim()
             ? { otp_code: values.otp_code.trim() }
