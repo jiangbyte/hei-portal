@@ -215,7 +215,9 @@ export function AuthLoginForm() {
       )
       message.success('登录成功')
       navigate(next)
-    } catch {
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : '登录失败'
+      message.error(msg)
       await captchaRef.current?.refresh()
     } finally {
       setLoading(false)

@@ -11,7 +11,7 @@ export type CaptchaInputHandle = {
 }
 
 type Props = {
-  /** Form.Item 注入 */
+  /** Ant Design Form.Item 注入 */
   value?: string
   onChange?: (value: string) => void
   status?: InputProps['status']
@@ -77,6 +77,7 @@ export const CaptchaInput = forwardRef<CaptchaInputHandle, Props>(function Captc
         placeholder="请输入验证码"
         allowClear
         onChange={(e) => onChange?.(e.target.value)}
+        onBlur={() => onChange?.(value ?? '')}
       />
       <button
         type="button"
