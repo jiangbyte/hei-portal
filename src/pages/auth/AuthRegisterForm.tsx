@@ -7,7 +7,7 @@ import { authApi } from '@/api'
 import { CaptchaInput, type CaptchaInputHandle } from '@/components/common/CaptchaInput'
 import { PasswordStrength } from '@/components/common/PasswordStrength'
 import { encryptPasswords } from '@/utils/security'
-import { isValidEmail, isValidPhone } from '@/utils/validate'
+import { isValidAccountLogin, isValidEmail, isValidPhone } from '@/utils/validate'
 import { wireBool } from '@/utils/wire'
 
 const OTP_COOLDOWN_SECONDS = 60
@@ -137,8 +137,8 @@ export function AuthRegisterForm() {
     }
     if (resolvedChannel === 'ACCOUNT') {
       const account = (values.account || '').trim()
-      if (account.length < 3 || account.length > 64) {
-        message.warning('用户名需 3-64 个字符')
+      if (!isValidAccountLogin(account)) {
+        message.warning('账号仅允许字母、数字和下划线，长度 3-64')
         return
       }
       encryptedPayload.account = account
@@ -236,7 +236,14 @@ export function AuthRegisterForm() {
               name="account"
               rules={[
                 { required: true, message: '请输入用户名' },
-                { min: 3, max: 64, message: '用户名需 3-64 个字符' },
+                {
+                  validator: (_, value) => {
+                    if (!isValidAccountLogin(String(value ?? ''))) {
+                      return Promise.reject(new Error('账号仅允许字母、数字和下划线，长度 3-64'))
+                    }
+                    return Promise.resolve()
+                  },
+                },
               ]}
             >
               <Input placeholder="用户名" allowClear />

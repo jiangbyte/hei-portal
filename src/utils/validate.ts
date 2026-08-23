@@ -8,6 +8,10 @@ export function isValidPhone(value: string) {
   return /^1\d{10}$/.test(value.trim())
 }
 
+export function isValidAccountLogin(value: string) {
+  return /^[a-zA-Z0-9_]{3,64}$/.test(value.trim())
+}
+
 /**
  * 仅允许同源相对路径：以单个 / 开头，禁止 // 与 /auth 前缀。
  */
