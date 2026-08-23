@@ -1,4 +1,4 @@
-# nginx 启动时 envsubst 渲染 ${BACKEND_URL} 等到 /etc/nginx/conf.d/default.conf
+# nginx 启动时 envsubst 渲染 ${BACKEND_HOST}、${BACKEND_PORT} 等到 default.conf
 server {
     listen 80;
     listen [::]:80;
@@ -25,7 +25,9 @@ server {
     }
 
     location /api/ {
-        proxy_pass ${BACKEND_URL};
+        resolver 127.0.0.11 valid=30s ipv6=off;
+        set $backend_url http://${BACKEND_HOST}:${BACKEND_PORT};
+        proxy_pass $backend_url;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
