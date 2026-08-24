@@ -7,7 +7,13 @@ import { auditApi } from '@/api'
 import { formatDateTime } from '@/utils'
 import { readPageMeta, wireBool } from '@/utils/wire'
 
-export function MyActivityLogPanel() {
+type ActivityLogMode = 'login' | 'operations'
+
+type Props = {
+  mode?: ActivityLogMode
+}
+
+export function MyActivityLogPanel({ mode = 'login' }: Props) {
   const [rows, setRows] = useState<any[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -20,7 +26,7 @@ export function MyActivityLogPanel() {
       const response = await auditApi.myPage({
         current: page,
         size: pageSize,
-        action: 'login',
+        ...(mode === 'login' ? { action: 'login' } : { exclude_action: 'login' }),
       } as any)
       const data = response.data ?? {}
       setRows(Array.isArray(data.records) ? data.records : [])
@@ -31,7 +37,7 @@ export function MyActivityLogPanel() {
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize])
+  }, [mode, page, pageSize])
 
   useEffect(() => {
     void fetchPage()
@@ -90,7 +96,7 @@ export function MyActivityLogPanel() {
 
       <Spin spinning={loading}>
         {!loading && !rows.length ? (
-          <Empty description="暂无登录记录" />
+          <Empty description={mode === 'login' ? '暂无登录记录' : '暂无操作记录'} />
         ) : (
           <Table
             size="small"
