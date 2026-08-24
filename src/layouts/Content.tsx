@@ -5,7 +5,11 @@ import { Outlet, useLocation } from 'react-router-dom'
 export function Content() {
   const { pathname } = useLocation()
   const isAuthPage = pathname.startsWith('/auth/')
-  const isProfilePage = pathname === '/profile' || pathname.startsWith('/profile/')
+  const isProfilePage =
+    pathname === '/profile' ||
+    pathname.startsWith('/profile/') ||
+    pathname === '/usercenter' ||
+    pathname.startsWith('/usercenter/')
 
   const mainClass = isAuthPage
     ? 'w-full min-h-[calc(100vh-64px-72px)] bg-[color-mix(in_srgb,var(--ant-color-fill-quaternary)_85%,#f5f7fa)] px-0 py-0'

@@ -23,8 +23,6 @@ import { formatDateTime, wireBool } from '@/utils'
 import { dictTypeData } from '@/utils/dict'
 import { readPageMeta } from '@/utils/wire'
 
-import { usePanelActions } from './PanelActionsContext'
-
 export function MessageFeedPanel() {
   const notifyReadAll = useMessageUnreadStore((s) => s.notifyReadAll)
   const [rows, setRows] = useState<any[]>([])
@@ -122,19 +120,16 @@ export function MessageFeedPanel() {
     message.success('已全部标记为已读')
   }
 
-  usePanelActions([loading, fetchPage], () => (
-    <Space size={8}>
-      <Button type="link" loading={loading} onClick={() => void fetchPage()}>
-        刷新
-      </Button>
-      <Button type="link" onClick={() => void markAllRead()}>
-        全部已读
-      </Button>
-    </Space>
-  ))
-
   return (
     <Space direction="vertical" size={12} className="w-full min-w-0">
+      <Flex justify="flex-end" gap={8}>
+        <Button type="link" loading={loading} onClick={() => void fetchPage()}>
+          刷新
+        </Button>
+        <Button type="link" onClick={() => void markAllRead()}>
+          全部已读
+        </Button>
+      </Flex>
 
       <Spin spinning={loading}>
         {!loading && !rows.length ? (

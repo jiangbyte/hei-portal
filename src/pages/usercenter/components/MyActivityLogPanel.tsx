@@ -1,12 +1,11 @@
 /** Author: Charlie */
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Button, Empty, Pagination, Space, Spin, Table, Tag } from 'antd'
+import { Button, Empty, Flex, Pagination, Space, Spin, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { auditApi } from '@/api'
 import { formatDateTime } from '@/utils'
 import { readPageMeta, wireBool } from '@/utils/wire'
-import { usePanelActions } from './PanelActionsContext'
 
 export function MyActivityLogPanel() {
   const [rows, setRows] = useState<any[]>([])
@@ -81,14 +80,14 @@ export function MyActivityLogPanel() {
     [],
   )
 
-  usePanelActions([loading, fetchPage], () => (
-    <Button type="link" loading={loading} onClick={() => void fetchPage()}>
-      刷新
-    </Button>
-  ))
-
   return (
     <div className="w-full min-w-0">
+      <Flex justify="flex-end" style={{ marginBottom: 8 }}>
+        <Button type="link" loading={loading} onClick={() => void fetchPage()}>
+          刷新
+        </Button>
+      </Flex>
+
       <Spin spinning={loading}>
         {!loading && !rows.length ? (
           <Empty description="暂无登录记录" />

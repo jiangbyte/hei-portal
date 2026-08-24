@@ -68,6 +68,27 @@ export function IdentityPanel() {
   const [wizardStep, setWizardStep] = useState(0)
   const [flowPhase, setFlowPhase] = useState<FlowPhase>('form')
   const pollTimerRef = useRef<number | null>(null)
+  const wizardRef = useRef<HTMLDivElement>(null)
+  const [wizardWidth, setWizardWidth] = useState(0)
+
+  useEffect(() => {
+    const el = wizardRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+
+    const updateWidth = (width: number) => {
+      setWizardWidth(width)
+    }
+
+    const observer = new ResizeObserver(([entry]) => {
+      updateWidth(entry.contentRect.width)
+    })
+    observer.observe(el)
+    updateWidth(el.clientWidth)
+    return () => observer.disconnect()
+  }, [])
+
+  const stepsVertical = wizardWidth > 0 && wizardWidth < 560
+  const stepsCompact = wizardWidth > 0 && wizardWidth < 680
 
   const businessType = useMemo(() => {
     const items = options?.business_types ?? options?.businessTypes ?? []
@@ -113,9 +134,13 @@ export function IdentityPanel() {
       } else if (index === wizardStep) {
         status = 'process'
       }
-      return { ...item, status }
+      return {
+        ...item,
+        status,
+        description: stepsCompact && !stepsVertical ? undefined : item.description,
+      }
     })
-  }, [flowPhase, wizardStep])
+  }, [flowPhase, wizardStep, stepsCompact, stepsVertical])
 
   const clearPollTimer = useCallback(() => {
     if (pollTimerRef.current != null) {
@@ -352,7 +377,11 @@ export function IdentityPanel() {
 
   return (
     <Spin spinning={loading}>
-      <div style={{ maxWidth: 680, margin: '0 auto', width: '100%' }}>
+      <div
+        ref={wizardRef}
+        className="identity-wizard"
+        style={{ maxWidth: 680, margin: '0 auto', width: '100%' }}
+      >
         {forceBindIdentity ? (
           <Alert
             type="warning"
@@ -367,8 +396,11 @@ export function IdentityPanel() {
         </Typography.Title>
 
         <Steps
+          className={`identity-wizard__steps${stepsVertical ? ' identity-wizard__steps--vertical' : ''}`}
           current={stepCurrent}
-          labelPlacement="vertical"
+          direction={stepsVertical ? 'vertical' : 'horizontal'}
+          labelPlacement="horizontal"
+          size="small"
           items={stepItems}
           style={{ marginBottom: 8 }}
         />

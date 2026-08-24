@@ -154,3 +154,88 @@ body {
 .fade-leave-to {
   opacity: 0;
 }
+
+.usercenter-layout {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  min-height: min(720px, calc(100vh - 160px));
+}
+
+.usercenter-page {
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.usercenter-summary-card,
+.usercenter-content-card {
+  height: 100%;
+}
+
+.usercenter-summary-card .ant-card-body,
+.usercenter-content-card .ant-card-body {
+  height: 100%;
+}
+
+.usercenter-summary-card {
+  flex: 0 0 280px;
+  width: 280px;
+  max-width: 280px;
+}
+
+.usercenter-content-card {
+  flex: 1;
+  min-width: 0;
+}
+
+.usercenter-content-card .ant-tabs {
+  height: 100%;
+}
+
+.usercenter-content-card .ant-tabs-content {
+  height: 100%;
+}
+
+.usercenter-content-card .ant-tabs-tabpane {
+  height: 100%;
+  overflow: auto;
+}
+
+.usercenter-main-tabs .ant-tabs-content {
+  min-height: 0;
+}
+
+.usercenter-security-tabs {
+  min-height: 360px;
+}
+
+.usercenter-security-tabs .ant-tabs-content-holder {
+  min-height: 320px;
+}
+
+.usercenter-security-tabs .ant-tabs-tabpane {
+  padding-left: 8px;
+}
+
+.identity-wizard__steps--vertical {
+  max-width: 280px;
+  margin-inline: auto;
+}
+
+.identity-wizard__steps:not(.identity-wizard__steps--vertical) .ant-steps-item-title {
+  white-space: normal;
+  line-height: 1.35;
+}
+
+@media (max-width: 960px) {
+  .usercenter-layout {
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .usercenter-summary-card {
+    flex: none;
+    width: 100%;
+    max-width: none;
+  }
+}
