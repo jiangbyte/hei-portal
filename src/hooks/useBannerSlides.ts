@@ -8,6 +8,10 @@ function isExternalUrl(url: string) {
   return /^https?:\/\//i.test(url)
 }
 
+function isSafeRelativePath(url: string) {
+  return url.startsWith('/') && !url.startsWith('//')
+}
+
 function bannerToSlide(banner: any): PromoSlide {
   const link = banner.url?.trim() || undefined
   const slide: PromoSlide = {
@@ -25,12 +29,17 @@ function bannerToSlide(banner: any): PromoSlide {
     return slide
   }
 
-  if (banner.link_type === 'ROUTE' || (!isExternalUrl(link) && link.startsWith('/'))) {
+  if (banner.link_type === 'ROUTE' || (!isExternalUrl(link) && isSafeRelativePath(link))) {
+    if (!isSafeRelativePath(link.startsWith('/') ? link : `/${link}`)) {
+      return slide
+    }
     slide.to = link.startsWith('/') ? link : `/${link}`
     return slide
   }
 
-  slide.href = link
+  if (isExternalUrl(link)) {
+    slide.href = link
+  }
   return slide
 }
 

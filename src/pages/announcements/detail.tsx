@@ -12,6 +12,13 @@ import { formatDateTime } from '@/utils/time'
 import { readPageMeta, wireBool } from '@/utils/wire'
 import { myNoticeApi, sysNoticeApi } from '@/api'
 
+const PURIFY_CONFIG: DOMPurify.Config = {
+  FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form'],
+  FORBID_ATTR: ['style'],
+  ALLOWED_URI_REGEXP:
+    /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+}
+
 async function findAnnouncementById(id: string) {
   const pageSize = 50
   let current = 1
@@ -135,7 +142,7 @@ export function AnnouncementDetailPage() {
                   <div
                     className="prose max-w-none text-sm leading-7"
                     dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(detail.content || ''),
+                      __html: DOMPurify.sanitize(detail.content || '', PURIFY_CONFIG),
                     }}
                   />
                 ) : detail.content_type === 'markdown' ? (
