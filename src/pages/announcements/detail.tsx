@@ -5,6 +5,7 @@ import { Button, Empty, Skeleton, Tag } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { Link, useParams } from 'react-router-dom'
 import DOMPurify from 'dompurify'
+import type { Config } from 'dompurify'
 import { Markdown } from '@/components/common/Markdown'
 import { useAuthStore } from '@/stores/auth'
 import { useMessageUnreadStore } from '@/stores/messageUnread'
@@ -12,11 +13,11 @@ import { formatDateTime } from '@/utils/time'
 import { readPageMeta, wireBool } from '@/utils/wire'
 import { myNoticeApi, sysNoticeApi } from '@/api'
 
-const PURIFY_CONFIG: DOMPurify.Config = {
+const PURIFY_CONFIG: Config = {
   FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form'],
   FORBID_ATTR: ['style'],
   ALLOWED_URI_REGEXP:
-    /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+    /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.-]+(?:[^a-z+.-:]|$))/i,
 }
 
 async function findAnnouncementById(id: string) {
