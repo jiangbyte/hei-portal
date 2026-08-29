@@ -22,7 +22,7 @@ COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 ENV BACKEND_HOST="127.0.0.1" \
     BACKEND_PORT="8000" \
     CLIENT_MAX_BODY_SIZE="10m" \
-    CONTENT_SECURITY_POLICY="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" \
+    CONTENT_SECURITY_POLICY="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: http: https:; font-src 'self' data:; connect-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" \
     HSTS_HEADER=""
 
 EXPOSE 80

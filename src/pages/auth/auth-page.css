@@ -1,5 +1,4 @@
-/* Portal 全屏认证页 — 颜色跟 Ant token，字体仅认证壳 */
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap');
+/* Portal 全屏认证页 — 颜色跟 Ant token，字体仅认证壳（系统字体，避免 CSP 拦截外链） */
 
 .portal-auth {
   --auth-primary: var(--ant-color-primary, #1677ff);
@@ -9,8 +8,8 @@
   --auth-muted: var(--ant-color-text-tertiary, #8b95a5);
   --auth-border: var(--ant-color-border-secondary, #eef2f7);
   --auth-radius: var(--ant-border-radius, 5px);
-  --auth-font-display: 'Sora', ui-sans-serif, system-ui, sans-serif;
-  --auth-font-body: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+  --auth-font-display: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --auth-font-body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
   /* 波浪海洋配色（浅色）— 与主题蓝协调的中等浓度 */
   --auth-wave-far: color-mix(in srgb, var(--auth-primary) 7%, transparent);
